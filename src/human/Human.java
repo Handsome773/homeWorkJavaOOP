@@ -1,5 +1,7 @@
+package human;
 import java.io.Serializable;
 import java.time.LocalDate;
+import java.time.Period;
 import java.util.List;
 import java.util.ArrayList;
 
@@ -10,7 +12,7 @@ public class Human implements Serializable {
     private Gender gender;
     private Human mother, father;
     private List<Human> children;
-    private Marriage marriage;  //супружество
+    private Marriage spouse;
 
     private static final int minParentAge = 17;
 
@@ -55,19 +57,22 @@ public class Human implements Serializable {
         children.add(child);
         return true;
     }
-    public Marriage getMarriage() {
-        return marriage;
+    public int getAge(){
+        return Period.between(dateBirth, LocalDate.now()).getYears(); //из гугла
     }
-    // TO DO как-то сделать этот метод доступным только классу Marriage
-    public void setMarriage(Marriage marriage) {
-        this.marriage = marriage;
+    public Human getSpouse() {
+        return spouse;
     }
-    public String getInfo(){
-        StringBuilder result = new  StringBuilder();
+        public void setSpouse(Human spouse) {
+            this.spouse = spouse;
+        public String getInfo(){
+            StringBuilder result = new  StringBuilder();
+            }
         result.append("{");
+        result.append(String.format("id: %d, ", id));
         result.append(String.format("Имя: %s, ", name));
         result.append(String.format("Дата рождения: %s, ", dateBirth.toString()));
-        result.append(String.format("Пол: %s, ", gender==Gender.Male ? "мужской":"женский"));
+        result.append(String.format("Пол: %s, ", gender== Gender.Male ? "мужской":"женский"));
         result.append(String.format("Отец: %s, ", (father==null ? "Нет данных" : father.getName())));
         result.append(String.format("Мать: %s, ", (mother==null ? "Нет данных" : mother.getName())));
         if(children.isEmpty()){
@@ -78,10 +83,10 @@ public class Human implements Serializable {
                 childrenNames.add(child.getName());
             result.append(String.format("Дети: %s, ", String.join(",", childrenNames)));
         }
-        if(this.marriage == null){
-            result.append(String.format("Семейное положение: %s", gender==Gender.Male ? "не женат" : "не замужем"));
+        if(this.spouse  == null){
+            result.append(String.format("Семейное положение: %s", gender== Gender.Male ? "не женат" : "не замужем"));
         }else{
-            result.append(String.format("Семейное положение: %s (idMarriage: %d)", (gender==Gender.Male ? "женат" : "замужем"), this.marriage.getId()));
+            result.append(String.format("Семейное положение: %s", gender== Gender.Male ? "женат" : "замужем"));
         }
         result.append("}");
         return result.toString();

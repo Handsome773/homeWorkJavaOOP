@@ -1,3 +1,7 @@
+package marriage;
+
+import human.Gender;
+import human.Human;
 import java.io.Serializable;
 import java.time.LocalDate;
 
@@ -14,20 +18,20 @@ public class Marriage implements Serializable {
         this.startDate = startDate;
         if(wife == null || wife.getGender() != Gender.Female
                 || wife.getDateBirth().plusYears(ageAdulthood).compareTo(this.startDate) > 0
-                || wife.getMarriage() != null) {   //уже в браке
+                || wife.getSpouse() != null) {   //уже в браке
             isError = true;
             return;
         }
         if(husband == null || husband.getGender() != Gender.Male
                 || husband.getDateBirth().plusYears(ageAdulthood).compareTo(this.startDate) > 0
-                || husband.getMarriage() != null) {
+                || husband.getSpouse() != null) {
             isError = true;
             return;
         }
         this.wife = wife;
-        wife.setMarriage(this);
         this.husband = husband;
-        husband.setMarriage(this);
+        wife.setSpouse(husband);
+        husband.setSpouse(wife);
     }
     public boolean getIsError(){ return isError; }
 
@@ -35,20 +39,21 @@ public class Marriage implements Serializable {
         return id;
     }
 
-    public boolean finish(LocalDate endDate){
+    public boolean stop(LocalDate endDate){
         if(endDate.compareTo(startDate) < 0) return false;
+        if(this.endDate != null) return false;
         this.endDate = endDate;
-        wife.setMarriage(null);
-        husband.setMarriage(null);
+        wife.setSpouse(null);
+        husband.setSpouse(null);
         return true;
     }
 
     public String getInfo(){
         return "{id: " + id
-                + ", startDate: " + startDate.toString()
-                + (endDate == null ? "" : ", endDate: " + endDate.toString())
-                + ", \nСупруга: " + wife.getInfo()
-                + ", \nСупруг: " + husband.getInfo()
+                + ", Супруга: {" + wife.getName() + ", id=" + wife.getId() + '}'
+                + ", Супруг: {" + husband.getName() + ", id=" + husband.getId() + '}'
+                + ", заключен: " + startDate.toString()
+                + (endDate == null ? ", статус: действителен" : ", статус: расторгнут " + endDate.toString())
                 + "}";
     }
 
