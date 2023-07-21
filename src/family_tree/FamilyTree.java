@@ -1,31 +1,30 @@
 package family_tree;
 
-import human.Human;
-import human.HumanGroup;
+import family_tree.group.GroupAgedNamed;
+import family_tree.group.Group;
 import marriage.Marriage;
-import marriage.MarriageGroup;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
-public class FamilyTree implements Serializable {
-    private HumanGroup humans;
-    private MarriageGroup marriages;
-    FamilyTree(){
-        humans = new HumanGroup();
-        marriages = new MarriageGroup();
+public class FamilyTree<T extends ItemFamilyTree<T>> implements Serializable {
+    private GroupAgedNamed<T> listItems;
+    private Group<Marriage<T>> marriages;
+    public FamilyTree(){
+        listItems = new GroupAgedNamed<>();
+        marriages = new Group<>();
     }
-    void addHuman(Human h){
-        humans.add(h);
+    public void add(T t){
+        listItems.add(t);
     }
 
-    void addMarriage(Marriage m){
+    public void addMarriage(Marriage m){
         marriages.add(m);
     }
 
-    public Human getHumanById(int id){
-        for(Human h : humans)
-            if(h.getId() == id)
-                return h;
+    public T getItemById(int id){
+        for(T t : listItems)
+            if(t.getId() == id)
+                return t;
         return null;
     }
     public Marriage getMarriageById(int id){
@@ -35,8 +34,8 @@ public class FamilyTree implements Serializable {
         return null;
     }
 
-    public String getHumansInfo(){
-        return humans.getInfo();
+    public String getItemsInfo(){
+        return listItems.getInfo();
     }
     public String getMarriagesInfo(){
         List<String> strings = new ArrayList<>();
@@ -45,18 +44,18 @@ public class FamilyTree implements Serializable {
         return String.join("\n", strings);
     }
     public String getInfoAll(){
-        return "{ humans: \n"
-                + getHumansInfo()
+        return "{ items: \n"
+                + getItemsInfo()
                 + ",\nmarriages: \n"
                 + getMarriagesInfo()
                 + "\n}";
     }
-    public void sortHumansByName(){
-        humans.sortByName();
+    public void sortItemsByName(){
+        listItems.sortByName();
     }
 
-    public void sortHumansByAge(){
-        humans.sortByAge();
+    public void sortItemsByAge(){
+        listItems.sortByAge();
     }
     @Override
     public String toString() {

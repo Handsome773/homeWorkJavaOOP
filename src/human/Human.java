@@ -1,11 +1,14 @@
-package human;
+package family_tree.human;
+import family_tree.Gender;
+import family_tree.ItemFamilyTree;
+
 import java.io.Serializable;
 import java.time.LocalDate;
 import java.time.Period;
 import java.util.List;
 import java.util.ArrayList;
 
-public class Human implements Serializable {
+public class Human implements ItemFamilyTree<Human>, Serializable {
     private int id;
     private String name;
     private LocalDate dateBirth, dateDeath;
@@ -63,6 +66,7 @@ public class Human implements Serializable {
     public Human getSpouse() {
         return spouse;
     }
+        public boolean isMarried(){ return spouse != null; }
         public void setSpouse(Human spouse) {
             this.spouse = spouse;
         public String getInfo(){

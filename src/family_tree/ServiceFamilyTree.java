@@ -1,26 +1,22 @@
 package family_tree;
 
-import human.Gender;
-import human.Human;
 import marriage.Marriage;
 import java.time.LocalDate;
 
-public class ServiceFamilyTree {
-    private int idHuman, idMarriage;
-    private FamilyTree tree;
+public class ServiceFamilyTree<T extends ItemFamilyTree<T>> {
+    private int idMarriage;
+    private FamilyTree<T> tree;
 
     public ServiceFamilyTree(){
-        tree = new FamilyTree();
+        tree = new FamilyTree<>();
     }
 
-    public Human addHuman(String name, LocalDate dateBirth, Gender gender){
-        Human h = new Human(idHuman++, name, dateBirth, gender);
-        tree.addHuman(h);
-        return h;
+    public void addItem(T t){
+        tree.add(t);
     }
     //регистрируем брак и возвращаем ссылку на экземпляр
     //Если нарушены условия, return null
-    public Marriage addMarriage(LocalDate startDate, Human wife, Human husband){
+    public Marriage addMarriage(LocalDate startDate, T wife, T husband){
         Marriage m = new Marriage(idMarriage, startDate, wife, husband);
         if(m.getIsError()) return null;
         tree.addMarriage(m);
@@ -28,19 +24,19 @@ public class ServiceFamilyTree {
         return m;
     }
     // добавляем связь родитель - потомок
-    public boolean addChild(Human parent, Human child){
+    public boolean addChild(T parent, T child){
         return parent.addChild(child);
     }
-    public boolean addChild(int idParent, int idChild){
-        Human parent = getHumanById(idParent);
-        if(parent==null) return false;
-        Human child = getHumanById(idChild);
-        if(child==null) return false;
-        return parent.addChild(child);
-    }
+//    public boolean addChild(int idParent, int idChild){
+//        Human parent = getHumanById(idParent);
+//        if(parent==null) return false;
+//        Human child = getHumanById(idChild);
+//        if(child==null) return false;
+//        return parent.addChild(child);
+//    }
     //return null, если список пуст либо id вне имеющихся
-    public Human getHumanById(int id){
-        return tree.getHumanById(id);
+    public T getItemById(int id){
+        return tree.getItemById(id);
     }
 
     //return null, если список пуст либо id вне имеющихся
@@ -54,17 +50,17 @@ public class ServiceFamilyTree {
         return m.stop(date);
     }
     public String getHumansInfo(){
-        return tree.getHumansInfo();
+        return tree.getItemsInfo();
     }
     public String getMarriagesInfo(){
         return tree.getMarriagesInfo();
     }
 
-    public void sortHumansByName(){
-        tree.sortHumansByName();
+    public void sortItemsByName(){
+        tree.sortItemsByName();
     }
-    public void sortHumansByAge(){
-        tree.sortHumansByAge();
+    public void sortItemsByAge(){
+        tree.sortItemsByAge();
     }
     public String getInfoAll(){
         return tree.getInfoAll();
