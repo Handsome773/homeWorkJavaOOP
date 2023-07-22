@@ -1,28 +1,29 @@
-package family_tree;
+package family_tree.model;
 
-import family_tree.group.GroupAgedNamed;
-import family_tree.group.Group;
-import marriage.Marriage;
+import family_tree.model.group.GroupExtended;
+import family_tree.model.group.Group;
+import family_tree.model.marriage.Marriage;
+
+
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
+
 public class FamilyTree<T extends ItemFamilyTree<T>> implements Serializable {
-    private GroupAgedNamed<T> listItems;
+    private GroupExtended<T> items;
     private Group<Marriage<T>> marriages;
     public FamilyTree(){
-        listItems = new GroupAgedNamed<>();
+        items = new GroupExtended<>();
         marriages = new Group<>();
     }
-    public void add(T t){
-        listItems.add(t);
+    public void addItem(T t){
+        items.add(t);
     }
-
     public void addMarriage(Marriage m){
         marriages.add(m);
     }
-
     public T getItemById(int id){
-        for(T t : listItems)
+        for(T t : items)
             if(t.getId() == id)
                 return t;
         return null;
@@ -33,9 +34,8 @@ public class FamilyTree<T extends ItemFamilyTree<T>> implements Serializable {
                 return m;
         return null;
     }
-
     public String getItemsInfo(){
-        return listItems.getInfo();
+        return items.getInfo();
     }
     public String getMarriagesInfo(){
         List<String> strings = new ArrayList<>();
@@ -50,12 +50,20 @@ public class FamilyTree<T extends ItemFamilyTree<T>> implements Serializable {
                 + getMarriagesInfo()
                 + "\n}";
     }
-    public void sortItemsByName(){
-        listItems.sortByName();
-    }
 
+    public String getInfoLastItem(){
+        if(items.getSize() == 0) return "";
+        return items.getElementByIndex(items.getSize()-1).getInfo();
+    }
+    public String getInfoLastMarriage(){
+        if(marriages.getSize() == 0) return "";
+        return marriages.getElementByIndex(marriages.getSize()-1).getInfo();
+    }
+    public void sortItemsByName(){
+        items.sortByName();
+    }
     public void sortItemsByAge(){
-        listItems.sortByAge();
+        items.sortByAge();
     }
     @Override
     public String toString() {
