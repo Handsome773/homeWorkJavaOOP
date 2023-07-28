@@ -1,5 +1,7 @@
 package family_tree.model.group;
 
+import family_tree.model.group.comparators.ComparatorByAge;
+import family_tree.model.group.comparators.ComparatorByName;
 import family_tree.model.group.iterators.GroupIterator;
 
 import java.io.Serializable;
@@ -7,9 +9,9 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 
-public class Group<E> implements Collectable<E>, Serializable {
+public class GroupItemFamilyTree<E extends ItemFamilyTree<E>> implements CollectableItemFamilyTree<E>, Serializable {
     List<E> listItem;
-    public Group(){
+    public GroupItemFamilyTree(){
         listItem = new ArrayList<>();
     }
 
@@ -23,6 +25,7 @@ public class Group<E> implements Collectable<E>, Serializable {
             listResult.add(e.toString());
         return String.join("\n", listResult);
     }
+
     public int getSize(){
         return listItem.size();
     }
@@ -35,4 +38,11 @@ public class Group<E> implements Collectable<E>, Serializable {
     @Override
     public Iterator<E> iterator() {
         return new GroupIterator<>(listItem);
+    }
+    public void sortByName(){
+        listItem.sort(new ComparatorByName<>());
+    }
+    public void sortByAge(){
+        listItem.sort(new ComparatorByAge<>());
+    }
 }

@@ -1,21 +1,25 @@
 package family_tree.model.marriage;
 
 import family_tree.model.Gender;
-import family_tree.model.ItemFamilyTree;
+import family_tree.model.Informer;
+import family_tree.model.group.ItemFamilyTree;
+import family_tree.model.human.Human;
 import java.io.Serializable;
 import java.time.LocalDate;
 
 //Класс заключения брака между двумя людьми
 public class Marriage<T extends ItemFamilyTree<T>> implements Serializable {
-    private int id;
-    private LocalDate startDate, endDate;
-    private T wife, husband;
+    int id;
+    LocalDate startDate, endDate;
+    T wife, husband;
     private static final int ageAdulthood = 18;
     private boolean isError = false;
+    private Informer<Marriage<T>> informer;
 
-    public Marriage(int id, LocalDate startDate, T wife, T husband){
+    public Marriage(int id, LocalDate startDate, T wife, T husband, Informer<Marriage<T>> informer){
         this.id = id;
         this.startDate = startDate;
+        this.informer = informer;
         if(wife == null || wife.getGender() != Gender.Female
                 || wife.getDateBirth().plusYears(ageAdulthood).compareTo(this.startDate) > 0
                 || wife.getSpouse() != null) {   //уже в браке
@@ -49,12 +53,7 @@ public class Marriage<T extends ItemFamilyTree<T>> implements Serializable {
     }
 
     public String getInfo(){
-        return "{id: " + id
-                + ", Супруга: {" + wife.getName() + ", id=" + wife.getId() + '}'
-                + ", Супруг: {" + husband.getName() + ", id=" + husband.getId() + '}'
-                + ", заключен: " + startDate.toString()
-                + (endDate == null ? ", статус: действителен" : ", статус: расторгнут " + endDate.toString())
-                + "}";
+        return informer.getInfo(this);
     }
 
     @Override

@@ -1,8 +1,13 @@
 package family_tree.model;
 
+import family_tree.model.group.Group;
+import family_tree.model.group.GroupItemFamilyTree;
 import family_tree.model.human.Human;
+import family_tree.model.human.InformerHuman;
+import family_tree.model.marriage.InformerMarriage;
 import family_tree.model.marriage.Marriage;
-import saveload.FileHandler;
+import saveload.LoadFrom;
+import saveload.SaveTo;
 import java.io.IOException;
 
 import java.time.LocalDate;
@@ -11,28 +16,23 @@ public class ServiceFamilyTree {
     private int idMarriage, idHuman;
     private FamilyTree<Human> tree;
 
-    public ServiceFamilyTree() {
-        tree = new FamilyTree();
+    private SaveTo saver;
+    private LoadFrom loader;
+    private InformerHuman informerHuman;
+    private InformerMarriage informerMarriage;
+
+    public ServiceFamilyTree(SaveTo saver, LoadFrom loader){
+        GroupItemFamilyTree<Human> humans = new GroupItemFamilyTree<>();
+        Group<Marriage<Human>> marriages = new Group<>();
+        tree = new FamilyTree(humans, marriages);
+        this.saver = saver;
+        this.loader = loader;
+        informerHuman = new InformerHuman();
     }
 
-    public Human addItem(String name, LocalDate dateBirth, Gender gender) {
-        Human h = new Human(idHuman++, name, dateBirth, gender);
-        tree.addItem(h);
-        return h;
-    }
-
-    public void addItem(Human t) {
-        tree.addItem(t);
-    }
-
-    //регистрируем брак и возвращаем ссылку на экземпляр
-    //Если нарушены условия, return null
-    public Marriage addMarriage(LocalDate startDate, Human wife, Human husband) {
-        Marriage m = new Marriage(idMarriage, startDate, wife, husband);
-        if (m.getIsError()) return null;
-        tree.addMarriage(m);
-        idMarriage++;
-        return m;
+    public void addItem(String name, LocalDate dateBirth, Gender gender){
+        //Объекты Human можем создавать только в сервисе
+        tree.addItem(new Human(idHuman++, name, dateBirth, gender, informerHuman));
     }
 
     public boolean addMarriage(LocalDate startDate, int idWife, int idHusband) {
@@ -41,17 +41,11 @@ public class ServiceFamilyTree {
         Human husband = getItemById(idHusband);
         if (husband == null) return false;
 
-        Marriage m = new Marriage(idMarriage, startDate, wife, husband);
+        Marriage<Human> m = new Marriage<>(idMarriage, startDate, wife, husband, informerMarriage);
         if (m.getIsError()) return false;
         tree.addMarriage(m);
         idMarriage++;
         return true;
-    }
-
-
-    // добавляем связь родитель - потомок
-    public boolean addChild(Human parent, Human child) {
-        return parent.addChild(child);
     }
 
     public boolean addChild(int idParent, int idChild) {
@@ -67,22 +61,17 @@ public class ServiceFamilyTree {
         return tree.getItemById(id);
     }
 
-    //return null, если список пуст либо id вне имеющихся
-    public Marriage getMarriageById(int id) {
-        return tree.getMarriageById(id);
-    }
-
     public boolean stopMarriageById(int id, LocalDate date) {
         Marriage m = tree.getMarriageById(id);
         if (m == null) return false;
         return m.stop(date);
     }
 
-    public String getHumansInfo() {
+    public String getInfoHumans() {
         return tree.getItemsInfo();
     }
 
-    public String getMarriagesInfo() {
+    public String getInfoMarriages() {
         return tree.getMarriagesInfo();
     }
 
@@ -98,9 +87,6 @@ public class ServiceFamilyTree {
         return tree.getInfoAll();
     }
 
-    public FamilyTree getTree() {
-        return tree;
-    }
 
     public String getInfoLastItem() {
         return tree.getInfoLastItem();
@@ -110,20 +96,19 @@ public class ServiceFamilyTree {
         return tree.getInfoLastMarriage();
     }
 
-    public boolean saveToFile(String path) {
-        FileHandler filehandler = new FileHandler();
+    public boolean saveTo(String path) {
         try {
-            filehandler.saveTo(tree, path);
+            saver.saveTo(tree, path);
         } catch (IOException e) {
-            return false;   //System.out.println(e.toString());
+            System.out.println(e.toString());
+            return false;
         }
         return true;
     }
 
-    public boolean loadFromFile(String path) {
-        FileHandler filehandler = new FileHandler();
+    public boolean loadFrom(String path) {
         try {
-            tree = (FamilyTree) filehandler.loadFrom(path);
+            tree = (FamilyTree)loader.loadFrom(path);
         } catch (IOException e) {
             return false;
         } catch (ClassNotFoundException e) {
