@@ -1,9 +1,9 @@
 package family_tree.model.marriage;
 
 import family_tree.model.Gender;
-import family_tree.model.Informer;
+import family_tree.model.Reportable;
 import family_tree.model.group.ItemFamilyTree;
-import family_tree.model.human.Human;
+
 import java.io.Serializable;
 import java.time.LocalDate;
 
@@ -14,12 +14,12 @@ public class Marriage<T extends ItemFamilyTree<T>> implements Serializable {
     T wife, husband;
     private static final int ageAdulthood = 18;
     private boolean isError = false;
-    private Informer<Marriage<T>> informer;
+    private Reportable<Marriage<T>> reportable;
 
-    public Marriage(int id, LocalDate startDate, T wife, T husband, Informer<Marriage<T>> informer){
+    public Marriage(int id, LocalDate startDate, T wife, T husband, Reportable<Marriage<T>> reportable){
         this.id = id;
         this.startDate = startDate;
-        this.informer = informer;
+        this.reportable = reportable;
         if(wife == null || wife.getGender() != Gender.Female
                 || wife.getDateBirth().plusYears(ageAdulthood).compareTo(this.startDate) > 0
                 || wife.getSpouse() != null) {   //уже в браке
@@ -53,7 +53,7 @@ public class Marriage<T extends ItemFamilyTree<T>> implements Serializable {
     }
 
     public String getInfo(){
-        return informer.getInfo(this);
+        return reportable.getInfo(this);
     }
 
     @Override
